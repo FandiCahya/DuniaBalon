@@ -1,0 +1,22 @@
+/* Pengaturan Font Utama */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Pengaturan Font Judul */
+.font-heading, h1, h2, h3 {
+    font-family: 'Fredoka', sans-serif;
+}
+
+/* Efek Kaca (Glassmorphism) */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Memperhalus scroll */
+html {
+    scroll-behavior: smooth;
+}
