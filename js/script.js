@@ -24,16 +24,58 @@ tailwind.config = {
     }
 }
 
+function renderSkeleton(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const cardCount = containerId === 'katalog-content' ? 4 : 3;
+
+    container.innerHTML = `
+        <div class="container mx-auto px-6 py-20">
+            <div class="space-y-8">
+                <div class="h-8 w-2/3 rounded-full skeleton-card"></div>
+                <div class="h-4 w-1/2 rounded-full skeleton-card"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+                    ${Array.from({ length: cardCount }, () => `
+                        <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+                            <div class="h-64 rounded-2xl skeleton-card mb-4"></div>
+                            <div class="h-4 w-3/4 rounded-full skeleton-card mb-3"></div>
+                            <div class="h-3 w-full rounded-full skeleton-card mb-2"></div>
+                            <div class="h-3 w-5/6 rounded-full skeleton-card mb-4"></div>
+                            <div class="flex justify-between items-center">
+                                <div class="h-5 w-20 rounded-full skeleton-card"></div>
+                                <div class="h-10 w-10 rounded-xl skeleton-card"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 async function loadSection(containerId, filePath) {
     const container = document.getElementById(containerId);
     if (!container) return;
+
+    renderSkeleton(containerId);
 
     try {
         const response = await fetch(filePath);
         if (!response.ok) {
             throw new Error(`Failed to load ${filePath}: ${response.status}`);
         }
-        container.innerHTML = await response.text();
+
+        const html = await response.text();
+        container.innerHTML = html;
+
+        const firstChild = container.firstElementChild;
+        if (firstChild) {
+            firstChild.classList.add('section-content');
+            requestAnimationFrame(() => {
+                firstChild.classList.add('is-visible');
+            });
+        }
     } catch (error) {
         console.error(error);
         container.innerHTML = `<div class="container mx-auto py-20 text-center text-red-600">Gagal memuat ${filePath}. Pastikan server berjalan dan file tersedia.</div>`;
@@ -52,7 +94,7 @@ function initOrderModal() {
     const sendWhatsappButton = document.getElementById('order-send-whatsapp');
     const closeButton = document.getElementById('order-close-btn');
 
-    const whatsappNumber = '62857233263735';
+    const whatsappNumber = '6285733263758';
     let currentProduct = {
         name: '',
         price: '',
@@ -102,7 +144,6 @@ function initOrderModal() {
         }
 
         const message = `Halo DuniaBalon, saya mau pesan ${currentProduct.name} sebanyak ${quantity}.
-Harga satuan: ${currentProduct.price}.
 Tolong konfirmasi ketersediaan dan total harganya.`;
         const encoded = encodeURIComponent(message);
         window.open(`https://wa.me/${whatsappNumber}?text=${encoded}`, '_blank');
